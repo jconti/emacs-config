@@ -1,57 +1,39 @@
 ;;;;
-;; Clojure
+;; setup-clojure.el - customizations for the development of Clojure code
 ;;;;
 
-;; Do not put the helpful startup text into the repl buffer
-(setq cider-repl-display-help-banner nil)
-
-;; Enable paredit for Clojure
-(add-hook 'clojure-mode-hook 'enable-paredit-mode)
+;; Enable paredit mode for Clojure development
+(add-hook 'clojure-mode-hook 'paredit-mode)
 
 ;; This is useful for working with camel-case tokens, like names of
 ;; Java classes (e.g. JavaClassName)
 (add-hook 'clojure-mode-hook 'subword-mode)
 
-;; Turn on a menu of definitions for every clojure code buffer
-(add-hook 'clojure-mode-hook 'imenu-add-menubar-index)
-
-;; Auto update imenu index of function names as they are added
-(setq imenu-auto-rescan t)
-
-;; Turn on rainbow delimiters for clojure code
-(add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-
-(require 'clojure-mode)
-
-(define-clojure-indent
-  (defroutes 'defun)
-  (GET 2)
-  (POST 2)
-  (PUT 2)
-  (DELETE 2)
-  (HEAD 2)
-  (ANY 2)
-  (context 2))
-
-;; A little more syntax highlighting
-(require 'clojure-mode-extra-font-locking)
+;; The minor mode electric-indent-mode interferes with paredit, this code
+;; was suggested https://stackoverflow.com/questions/21182550
+(add-hook 'clojure-mode-hook (lambda () (electric-indent-local-mode -1)))
 
 ;;;;
 ;; Cider
 ;;;;
 
-;; prefix for interactive evaluation of code
-(setq cider-eval-result-prefix ";; => ")
+;; Workaround for RET not running code in Cider's REPL
+;; See https://paredit.org/cgit/paredit/plain/NEWS
+(add-hook 'cider-mode-hook
+          (lambda ()
+            (define-key paredit-mode-map (kbd "RET") nil)
+            (define-key paredit-mode-map (kbd "C-j") 'paredit-newline)()
+            (electric-indent-local-mode -1)))
 
-;; highlight symbols from all namespaces
-(setq cider-font-lock-dynamically '(macro core function var))
+;; Turn off inspiration message at start of REPL session
+(setq cider-connection-message-fn nil)
+(setq cider-repl-display-help-banner nil)
+
+;; change the default prefix to add more space for readibility
+(setq cider-eval-result-prefix " ;;  => ")
 
 ;; provides minibuffer documentation for the code you're typing into the repl
 (add-hook 'cider-mode-hook 'eldoc-mode)
-
-;; adds completion of source and repl code via company-mode
-(add-hook 'cider-mode-hook #'company-mode)
-(add-hook 'cider-repl-mode-hook #'company-mode)
 
 ;; go right to the REPL buffer when it's finished connecting
 (setq cider-repl-pop-to-buffer-on-connect t)
@@ -63,12 +45,6 @@
 ;; Where to store the cider history.
 (setq cider-repl-history-file "~/.emacs.d/cider-history")
 
-;; Wrap when navigating history.
-(setq cider-repl-wrap-history t)
-
-;; Disables moving focus to the buffer with a stacktrace
-(setq cider-auto-select-error-buffer nil)
-
 ;; enable paredit in your REPL
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
 
@@ -76,21 +52,39 @@
 (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
 (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
 (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
-(add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode))
 
-
-;; key bindings
-
-(defun cider-refresh ()
-  (interactive)
-  (cider-interactive-eval (format "(user/reset)")))
-
+;; A function to go back to the user namespace
 (defun cider-user-ns ()
   (interactive)
   (cider-repl-set-ns "user"))
 
+;; Customize Cider keymap
 (eval-after-load 'cider
   '(progn
-     (define-key clojure-mode-map (kbd "C-M-r") 'cider-refresh)
-     (define-key clojure-mode-map (kbd "C-c M-u") 'cider-user-ns)
-     (define-key cider-mode-map (kbd "C-c M-u") 'cider-user-ns)))
+     (define-key clojure-mode-map (kbd "C-c u") 'cider-user-ns)))
+
+;; Run cljfmt on each file before save
+(add-hook 'before-save-hook 'cider-format-buffer t t)
+
+;;;;
+;; JDK Selection
+;;;;
+
+;; Inspiration from https://blog.brunobonacci.com/2020/07/02/switching-between-multiple-jdk-in-emacs/
+
+;; location where Intel arch homebrew installs Java
+(setq JAVA_BASE "/usr/local/opt")
+
+(defun java-home--versions ()
+  "Return the list of installed JDKs."
+  (directory-files JAVA_BASE t "openjdk@[[:digit:]]+"))
+
+(defun java-home--switch ()
+  "List installed JDKs and switch JAVA_HOME to the one chosen."
+  (interactive)
+  (let ((ver-path (completing-read
+                   "Which JDK: "
+                   (seq-map-indexed
+                    (lambda (e i) (list e i)) (java-home--versions))
+                   nil t "")))
+    (setenv "JAVA_HOME" ver-path)))
