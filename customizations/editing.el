@@ -9,7 +9,9 @@
 (setq-default indent-tabs-mode nil)
 
 ;; Enable rainbow editing for all programming
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 ;; Not sure why this is disabled
 (electric-indent-mode nil)

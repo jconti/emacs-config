@@ -2,30 +2,31 @@
 ;; init.el - main configuration file entry point for Emacs 28.1
 ;;;;
 
-;; Define package repositories, and packages pinned to repositories
-;; Customizations might load packages so do this first
-(require 'package)
-(add-to-list 'package-archives
-             '("tromey" . "http://tromey.com/elpa/") t)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-pinned-packages
-             '("cider" . "melpa-stable") t)
-
-;; Define the location where all the customization files are found
-;; there can be multiple sets used for different versions of emacs
+;; Location for specialized customization files
 (defconst customizations-directory (concat user-emacs-directory "customizations/"))
+(add-to-list 'load-path customizations-directory)
 
-;; Set the file where Emacs can save and restore Customizations made interactively
+;; File where Emacs saves and restores Customizations made interactively
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
 (setq custom-file (concat customizations-directory "emacs-custom.el"))
 
-;; Load the saved state of the Emacs customizations system
-;; They can contain package definitions needed first
-(load custom-file)
+;; Define package repositories, and packages pinned to repositories
+(require 'package)
+(add-to-list 'package-archives '("tromey" . "http://tromey.com/elpa/"))
+(add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
 
-;; Automatically load files from the customizations-dir
-(add-to-list 'load-path customizations-directory)
+;; Bootstrap use-package system
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-and-compile
+  (setq use-package-always-ensure t
+        use-package-expand-minimally t))
+
+;; Load the saved interactive customizations system (Can contain package loads)
+(load custom-file)
 
 ;; Load global user interface changes
 (load "ui.el")
@@ -38,7 +39,3 @@
 
 ;; Load Clojure customizations
 (load "setup-clojure.el")
-
-;; Load SQL connection defs
-(load "setup-sql.el")
-
