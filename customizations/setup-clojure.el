@@ -2,6 +2,10 @@
 ;; setup-clojure.el - customizations for the development of Clojure code
 ;;;;
 
+;; add environment variable to slow down lein ancient timeouts for artifactory
+;; uncertain if this works and what the reference is, does it also affect clj tools wagon?
+(setenv "http_timeout" "20000")
+
 ;; Should select 20221127.1452 version from melpa
 (use-package paredit
   :ensure t

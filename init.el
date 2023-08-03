@@ -25,17 +25,11 @@
   (setq use-package-always-ensure t
         use-package-expand-minimally t))
 
-;; Load the saved interactive customizations system (Can contain package loads)
-(load custom-file)
-
-;; Load global user interface changes
+;; Load customizations from 'customizations-directory
+(load "shell-integration.el")
 (load "ui.el")
-
-;; Load global navigation changes
 (load "navigation.el")
-
-;; Load global editing changes
 (load "editing.el")
-
-;; Load Clojure customizations
 (load "setup-clojure.el")
+(load "markdown.el")
+(load custom-file)

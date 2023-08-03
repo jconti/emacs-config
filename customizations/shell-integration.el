@@ -1,9 +1,13 @@
-;; Sets up exec-path-from shell
-;; https://github.com/purcell/exec-path-from-shell
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-envs
-   '("PATH")))
+;;;;
+;; shell-integration.el - handles unusual issues with environment on Macos
+;;;;
 
-;; add environment variable to slow down lein ancient timeouts for artifactory
-(setenv "http_timeout" "20000")
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  ;; https://github.com/purcell/exec-path-from-shell
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize)
+    (exec-path-from-shell-copy-envs
+     '("PATH")))
+  )
