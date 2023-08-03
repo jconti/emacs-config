@@ -6,4 +6,4 @@
 (use-package markdown-mode
 	:ensure t
 	:mode ("\\.md$'" . gfm-mode)
-	:config (setq markdown-command "marked"))
+	:config (setq markdown-command "marked --no-mangle --no-headerIds --gfm"))
