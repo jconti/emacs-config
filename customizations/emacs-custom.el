@@ -11,7 +11,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(tango-dark))
  '(package-selected-packages
-   '(markdown-mode cider clojure-mode paredit rainbow-delimiters smex ido-completing-read+ use-package)))
+   '(magit git-link markdown-mode cider clojure-mode paredit rainbow-delimiters smex ido-completing-read+ use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

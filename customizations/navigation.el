@@ -2,6 +2,10 @@
 ;; navigation.el - customize the way files, buffers and other navigation is done
 ;;;;
 
+(use-package magit)
+
+(use-package git-link)
+
 ;; browse-at-remote enables browsing git forge sites (like github, gitlab, etc.)
 ;; (require 'browse-at-remote)
 ;; (global-set-key (kbd "C-c g g") 'browse-at-remote)

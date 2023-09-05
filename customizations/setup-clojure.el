@@ -82,7 +82,10 @@
        (define-key clojure-mode-map (kbd "C-c u") 'cider-user-ns)))
 
   ;; Run cljfmt on each file before save
-  (add-hook 'before-save-hook 'cider-format-buffer t t))
+  (add-hook 'before-save-hook 'cider-format-buffer t t)
+
+  ;; set the internal request timeout for evaluation
+  (setq nrepl-sync-request-timeout 30))
 
 ;;;;
 ;; JDK Selection
