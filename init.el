@@ -27,6 +27,7 @@
 
 ;; Load customizations from 'customizations-directory
 (load "shell-integration.el")
+(load "setup-plantuml.el")
 (load "ui.el")
 (load "navigation.el")
 (load "editing.el")

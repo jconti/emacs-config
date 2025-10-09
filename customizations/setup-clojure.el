@@ -6,6 +6,32 @@
 ;; uncertain if this works and what the reference is, does it also affect clj tools wagon?
 (setenv "http_timeout" "20000")
 
+;;;;
+;; JDK Selection
+;;;;
+
+;; Inspiration from https://blog.brunobonacci.com/2020/07/02/switching-between-multiple-jdk-in-emacs/
+
+;; location where Intel arch homebrew installs Java
+(setq JAVA_BASE "/opt/homebrew/opt")
+
+(defun java-home--versions ()
+  "Return the list of installed JDKs."
+  (directory-files JAVA_BASE t "openjdk@[[:digit:]]+"))
+
+(defun java-home--switch ()
+  "List installed JDKs and switch JAVA_HOME to the one chosen."
+  (interactive)
+  (let ((ver-path (completing-read
+                   "Which JDK: "
+                   (seq-map-indexed
+                    (lambda (e i) (list e i)) (java-home--versions))
+                   nil t "")))
+    (setenv "JAVA_HOME" ver-path)))
+
+;; default to the oldest JVM
+(setenv "JAVA_HOME" (car (java-home--versions)))
+
 ;; Should select 20221127.1452 version from melpa
 (use-package paredit
   :ensure t
@@ -18,6 +44,39 @@
          ("\\.cljs$" . clojure-mode)
          ("\\.cljc$" . clojure-mode))
   :config
+
+
+  ;; Cloudpermit standard format settings, more at
+  ;; https://github.com/cloudpermit/vaahtera/blob/develop/docs/editors.md#emacs-cider
+  (setq clojure-indent-style 'align-arguments)
+  (setq clojure-align-binding-forms
+        '("let" "when-let" "when-some" "if-let" "if-some" "binding" "loop"
+          "doseq" "for" "with-open" "with-local-vars" "with-redefs"
+          "r/with-let" "p/if-all-let" "test-seq/seq-tx"))
+  (setq singly-indented-functions '(testit/fact
+                                    testit/facts
+                                    facts
+                                    fact
+                                    testit.core/fact
+                                    page/html5
+                                    rf/reg-event-fx
+                                    chain/reg-chain
+                                    rf/reg-sub
+                                    rf/reg-event-db
+                                    rc/reg-chain
+                                    futil/for-all
+                                    futil/for-frag
+                                    for-frag
+                                    for-all
+                                    u/for-all
+                                    not-join
+                                    r/with-let
+                                    p/if-all-let
+                                    test-seq/seq-tx
+                                    or-join))
+  (dolist (expr singly-indented-functions)
+    (put-clojure-indent expr 1))
+
   ;; This is useful for working with camel-case tokens, like names of
   ;; Java classes (e.g. JavaClassName)
   (add-hook 'clojure-mode-hook 'subword-mode)
@@ -63,7 +122,7 @@
 
   ;; When there's a cider error, show its buffer and switch to it
   (setq cider-show-error-buffer t)
-  (setq cider-auto-select-error-buffer t)
+  ;(setq cider-auto-select-error-buffer t)
 
   ;; Where to store the cider history.
   (setq cider-repl-history-file "~/.emacs.d/cider-history")
