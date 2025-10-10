@@ -37,6 +37,25 @@
   :ensure t
   :pin melpa)
 
+;; provisional setup
+(use-package lsp-mode
+  :defer t
+  :hook ((clojure-mode  . lsp))
+  :bind (:map lsp-mode-map
+              ("C-M-." . lsp-find-references))
+  :config
+
+  ;; use cider for symbol completion
+  ;; https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/#completion
+  (setq lsp-enable-completion-at-point nil)
+  (setq lsp-enable-xref t))
+
+;; I get the following warning, separate clj vs. cljs configs might be needed or useful?
+;;
+;;;  [WARNING] Something in your configuration activated ‘clojure-mode’ instead of ‘clojurescript-mode’ in this buffer.
+;;;  This could cause problems.
+;;;  (See ‘clojure-verify-major-mode’ to disable this message.)
+
 (use-package clojure-mode
   :ensure t
   :mode (("\\.clj$"  . clojure-mode)
@@ -143,28 +162,14 @@
   ;; Run cljfmt on each file before save
   (add-hook 'before-save-hook 'cider-format-buffer t t)
 
+  ;; vaahtera path in one profile does not work for both clj and cljs
+  ;; so repls must be started seperately and this joins them together
+  ;; See https://github.com/cloudpermit/vaahtera/blob/77b5645a5eb2810aae982a80bcf08bab783641a9/docs/editors.md#emacs-cider
+  (setq cider-merge-sessions 'host)
+
+  ;; When I do cider-jack-in-cljs as the above page advises it complains that there is already another session with the same
+  ;; connection parameters and it suggests I use cider-connect-sibling-cljs
+  ;; If I chose 'y' to connect anyway, I need to then select `shadow-cljs` and not `lein` to get it to start
+
   ;; set the internal request timeout for evaluation
   (setq nrepl-sync-request-timeout 30))
-
-;;;;
-;; JDK Selection
-;;;;
-
-;; Inspiration from https://blog.brunobonacci.com/2020/07/02/switching-between-multiple-jdk-in-emacs/
-
-;; location where Intel arch homebrew installs Java
-(setq JAVA_BASE "/usr/local/opt")
-
-(defun java-home--versions ()
-  "Return the list of installed JDKs."
-  (directory-files JAVA_BASE t "openjdk@[[:digit:]]+"))
-
-(defun java-home--switch ()
-  "List installed JDKs and switch JAVA_HOME to the one chosen."
-  (interactive)
-  (let ((ver-path (completing-read
-                   "Which JDK: "
-                   (seq-map-indexed
-                    (lambda (e i) (list e i)) (java-home--versions))
-                   nil t "")))
-    (setenv "JAVA_HOME" ver-path)))
