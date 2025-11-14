@@ -60,8 +60,8 @@
   :ensure t
   :mode (("\\.clj$"  . clojure-mode)
          ("\\.edn$"  . clojure-mode)
-         ("\\.cljs$" . clojure-mode)
-         ("\\.cljc$" . clojure-mode))
+         ("\\.cljs$" . clojurescript-mode)
+         ("\\.cljc$" . clojurescript-mode))
   :config
 
 
@@ -173,3 +173,9 @@
 
   ;; set the internal request timeout for evaluation
   (setq nrepl-sync-request-timeout 30))
+
+;;;;
+;; Copilot
+;;;;
+
+;(use-package copilot-chat)

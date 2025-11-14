@@ -5,6 +5,9 @@
 (setq-default sh-basic-offset 2)
 (setq-default sh-indentation 2)
 
+;; json
+(setq js-indent-level 2)
+
 ;; No need for ~ files when editing
 (setq create-lockfiles nil)
 
@@ -16,4 +19,3 @@
 
 ;; Load live-code-talks.el
 (require 'live-code-talks)
-

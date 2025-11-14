@@ -9,9 +9,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(tango-dark))
+ '(custom-enabled-themes '(modus-vivendi))
  '(package-selected-packages
-   '(ztree magit git-link markdown-mode cider clojure-mode paredit rainbow-delimiters smex ido-completing-read+ use-package)))
+   '(ztree use-package smex rainbow-delimiters plantuml-mode paredit magit lsp-mode ido-completing-read+ git-link exec-path-from-shell cider)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

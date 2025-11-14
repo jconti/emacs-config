@@ -56,3 +56,8 @@
     (with-current-buffer buffer (diff-mode))
     (call-process-shell-command command nil buffer 0)
     (switch-to-buffer buffer)))
+
+;; Load the ztree package to perform recursive directory and file comparisons
+;; install GNU diffutils with `brew install diffutils`
+(use-package ztree
+  :ensure t)
